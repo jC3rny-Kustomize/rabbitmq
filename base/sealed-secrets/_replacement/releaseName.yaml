@@ -1,0 +1,62 @@
+---
+
+# releaseName
+source:
+  version: builtin
+  kind: HelmChartInflationGenerator
+  name: rabbitmq
+  
+  fieldPath: releaseName
+
+targets:
+  # PrefixSuffixTransformer
+  - select:
+      version: builtin
+      kind: PrefixSuffixTransformer
+      name: sealed-secrets-prefix
+    fieldPaths:
+      - prefix
+
+  # Secret
+  - select:
+      version: v1
+      kind: Secret
+      name: -password-sealed
+    options:
+      create: true
+    fieldPaths:
+      - metadata.labels.[app.kubernetes.io/instance]
+  
+  - select:
+      version: v1
+      kind: Secret
+      name: -erlang-cookie-sealed
+    options:
+      create: true
+    fieldPaths:
+      - metadata.labels.[app.kubernetes.io/instance]
+  
+  # SealedSecret
+  - select:
+      group: bitnami.com
+      version: v1alpha1
+      kind: SealedSecret
+      name: -password-sealed
+    options:
+      create: true
+    fieldPaths:
+      - metadata.labels.[app.kubernetes.io/instance]
+      - spec.template.metadata.labels.[app.kubernetes.io/instance]
+      - spec.template.metadata.labels.[argocd.argoproj.io/instance]
+  
+  - select:
+      group: bitnami.com
+      version: v1alpha1
+      kind: SealedSecret
+      name: -erlang-cookie-sealed
+    options:
+      create: true
+    fieldPaths:
+      - metadata.labels.[app.kubernetes.io/instance]
+      - spec.template.metadata.labels.[app.kubernetes.io/instance]
+      - spec.template.metadata.labels.[argocd.argoproj.io/instance]
